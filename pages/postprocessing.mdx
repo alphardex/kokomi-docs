@@ -1,0 +1,43 @@
+Adding postprocessing effect in kokomi.js is a piece of cake.
+
+## CustomEffect
+
+You can use `kokomi.CustomEffect` to create postprocessing effect, which only needs a fragment shader.
+
+Also, some variables like `iTime` are automatically injected into the shader.
+
+```js
+const ce = new kokomi.CustomEffect(this, {
+  fragmentShader: /* glsl */ `
+uniform float iTime;
+uniform vec2 iResolution;
+uniform vec2 iMouse;
+
+uniform sampler2D tDiffuse;
+
+varying vec2 vUv;
+
+void main(){
+    vec2 uv=vUv;
+    vec2 size=vec2(50.,50.);
+    uv=floor(uv*size)/size;
+    vec4 tex=texture(tDiffuse,uv);
+    vec3 col=tex.xyz;
+    gl_FragColor=vec4(col,1.);
+}
+      `,
+});
+ce.addExisting();
+```
+
+<iframe
+  height="400"
+  style={{ width: "100%" }}
+  scrolling="no"
+  title="CustomEffect"
+  src="https://codepen.io/alphardex/embed/XWOoNNV?default-tab=html%2Cresult&editable=true"
+  frameborder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowfullscreen="true"
+></iframe>

@@ -1,0 +1,91 @@
+kokomi.js provides several useful utilities for you to master the shader.
+
+## UniformInjector
+
+When you write a `ShaderMaterial`, you often need the `time`, `resolution`, and even `mouse` variable.
+
+Instead of writing these variables by yourself, you can just use kokomi.js's `UniformInjector` to inject these variables at once. Note that the names of these variables are the same as [Shadertoy's variables](https://www.shadertoy.com/howto).
+
+```js
+const material = new THREE.ShaderMaterial({
+  vertexShader: /* glsl */ `...`,
+  fragmentShader: /* glsl */ `...`,
+});
+const mesh = new THREE.Mesh(geometry, material);
+this.scene.add(mesh);
+const uj = new kokomi.UniformInjector(this);
+material.uniforms = {
+  ...material.uniforms,
+  ...uj.shadertoyUniforms,
+};
+this.update(() => {
+  uj.injectShadertoyUniforms(material.uniforms);
+});
+```
+
+<iframe
+  height="400"
+  style={{ width: "100%" }}
+  scrolling="no"
+  title="UniformInjector"
+  src="https://codepen.io/alphardex/embed/rNPoMGL?default-tab=html%2Cresult&editable=true"
+  frameborder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowfullscreen="true"
+></iframe>
+
+## ShadertoyElement
+
+Sometimes you just want to only write the fragment shader like [Shadertoy](https://www.shadertoy.com/). You can use the custom HTML Tag - `ShadertoyElement` to achieve this.
+
+```html
+<shader-toy>
+  <script type="frag"></script>
+</shader-toy>
+
+<script>
+  document.querySelector("[type=frag]").textContent = /* glsl */ `
+vec2 cart2polar(vec2 uv){
+    float phi=atan(uv.y,uv.x);
+    float r=length(uv);
+    return vec2(phi,r);
+}
+
+void mainImage(out vec4 fragColor,in vec2 fragCoord){
+    vec2 uv=fragCoord/iResolution.xy;
+    uv=(uv-.5)*2.;
+    uv.x*=iResolution.x/iResolution.y;
+    
+    uv=cart2polar(uv);
+    
+    // spiral
+    float c=sin(uv.y*20.+uv.x);
+    fragColor=vec4(vec3(c),1.);
+}
+    `;
+  kokomi.ShaderToyElement.register();
+</script>
+```
+
+Behind this, kokomi.js actually created a `kokomi.ScreenQuad` instance.
+
+```js
+const quad = new kokomi.ScreenQuad(this, {
+  fragmentShader: /* glsl */ `...`,
+  shadertoyMode: true,
+});
+quad.addExisting();
+```
+
+<iframe
+  height="400"
+  style={{ width: "100%" }}
+  scrolling="no"
+  title="ShadertoyElement"
+  src="https://codepen.io/alphardex/embed/bGzOwYJ?default-tab=html%2Cresult&editable=true"
+  frameborder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowfullscreen="true"
+></iframe>

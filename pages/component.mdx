@@ -1,0 +1,113 @@
+As your project grow bigger, you should organize your project structure.
+
+For kokomi.js, component will be a good choice. Because every component can keep its own state, and prevent your code from coupling.
+
+## Basic component
+
+To create a component, just extend the `kokomi.Component` class.
+
+Also, we should pass the `kokomi.Base` instance to it, so that it will know the current context.
+
+To add the actual object to the scene, we can define `addExisting` method, or just add the object in the constructor which is also OK.
+
+```js
+class MyComponent extends kokomi.Component {
+  constructor(base) {
+    super(base);
+
+    const geometry = new THREE.BoxGeometry();
+    const material = new THREE.MeshBasicMaterial();
+    const box = new THREE.Mesh(geometry, material);
+    this.box = box;
+
+    // Just add without addExisting is also OK.
+    // this.container.add(this.box);
+  }
+  addExisting() {
+    this.container.add(this.box);
+  }
+}
+
+class Sketch extends kokomi.Base {
+  create() {
+    const mc = new MyComponent(this);
+    mc.addExisting();
+  }
+}
+```
+
+## Properties
+
+A component can have some properties.
+
+```js
+class MyComponent extends kokomi.Component {
+  constructor(base, config = {}) {
+    super(base);
+
+    const {
+      position = new THREE.Vector3(0, 0, 0),
+      color = "white",
+      speed = 1,
+    } = config;
+    this.speed = speed;
+
+    const geometry = new THREE.BoxGeometry();
+    const material = new THREE.MeshBasicMaterial({
+      color,
+    });
+    const box = new THREE.Mesh(geometry, material);
+    box.position.copy(position);
+    this.box = box;
+  }
+  addExisting() {
+    this.container.add(this.box);
+  }
+}
+
+class Sketch extends kokomi.Base {
+  create() {
+    const mc1 = new MyComponent(this);
+    mc1.addExisting();
+    const mc2 = new MyComponent(this, {
+      position: new THREE.Vector3(2, 0, 0),
+      color: "red",
+      speed: 3,
+    });
+    mc2.addExisting();
+    const mc3 = new MyComponent(this, {
+      position: new THREE.Vector3(-2, 0, 0),
+      color: "green",
+      speed: 2,
+    });
+    mc3.addExisting();
+  }
+}
+```
+
+## Render Loop
+
+Component's `update` method will be executed in every render.
+
+```js
+class MyComponent extends kokomi.Component {
+  ...
+  update() {
+    this.box.rotation.y = this.clock.elapsedTime * this.speed;
+  }
+}
+```
+
+## Demo
+
+<iframe
+  height="400"
+  style={{ width: "100%" }}
+  scrolling="no"
+  title="Component"
+  src="https://codepen.io/alphardex/embed/RwvEGoM?default-tab=html%2Cresult&editable=true"
+  frameborder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowfullscreen="true"
+></iframe>

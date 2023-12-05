@@ -1,0 +1,79 @@
+Managing assets in kokomi.js is pretty easy!
+
+## Traditional way
+
+When using vanilla three.js, we usually load assets like this:
+
+```js
+const texLoader = new THREE.TextureLoader();
+const tex = texLoader.load("asset url");
+...
+
+const gltfLoader = new GLTFLoader();
+gltfLoader.load("asset url", (gltf) => {
+    const model = gltf.scene;
+    ...
+});
+```
+
+Actually this is totally acceptable and intuitive.
+
+But if we want to load many assets with different types, it will be very messy.
+
+So we need to load assets in a more uniform way.
+
+## kokomi.js way
+
+First, you define a list of assets.
+
+```js
+const resourceList = [
+  {
+    name: "tex",
+    type: "texture",
+    path: "asset url",
+  },
+  {
+    name: "model",
+    type: "gltfModel",
+    path: "asset url",
+  },
+];
+```
+
+Note that the list item has 3 fields: `name`, `type` and `path`.
+
+- `name` is just the key name of asset.
+- `type` is the type of asset, includes: `texture`, `gltfModel`, `cubeTexture`, etc. Different type has its corresponding loader, such as `texture` - `THREE.TextureLoader`, etc. You can view all the types with `kokomi.ResourceItem` ts type or [source code](https://github.com/alphardex/kokomi.js/blob/c2e021abd42c2ca56387db519ac9355741791769/src/components/assetManager.ts#L20C21-L20C21).
+- `path` is the url of asset, if you are using a bundler (e.g. vite), it has its own way of handling asset url. (such as `import` statement)
+
+Then create the asset manager:
+
+```js
+const am = new kokomi.AssetManager(this, resourceList);
+```
+
+The asset manager will automatically start to load all the assets in the list, you just need to listen for the load complete (which is `ready`) event.
+After loading complete, you can access the assets via the instance's `items`, which is just a map of asset's key name and its content.
+
+```js
+am.on("ready", () => {
+  const tex = am.items.tex;
+  const model = am.items.model;
+  // handle these assets ...
+});
+```
+
+## Demo
+
+<iframe
+  height="400"
+  style={{ width: "100%" }}
+  scrolling="no"
+  title="Asset Manage"
+  src="https://codepen.io/alphardex/embed/RwvEGbj?default-tab=html%2Cresult&editable=true"
+  frameborder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowfullscreen="true"
+></iframe>
