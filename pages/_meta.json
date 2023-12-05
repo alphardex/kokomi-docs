@@ -1,7 +1,7 @@
 {
   "index": "Introduction",
   "component": "Component",
-  "asset-manage": "Asset Manage",
+  "asset-management": "Asset Management",
   "shader": "Shader",
   "postprocessing": "Postprocessing"
 }
