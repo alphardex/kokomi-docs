@@ -1,7 +1,19 @@
 {
   "index": "Introduction",
-  "component": "Component",
-  "asset-management": "Asset Management",
-  "shader": "Shader",
-  "postprocessing": "Postprocessing"
+  "guide": "Guide",
+  "api": {
+    "title": "API",
+    "href": "https://kokomi-js.netlify.app/docs/modules.html",
+    "newWindow": true
+  },
+  "examples": {
+    "title": "Examples",
+    "href": "https://kokomi-js.netlify.app/examples/",
+    "newWindow": true
+  },
+  "shaders": {
+    "title": "Shaders",
+    "href": "https://shadertoy-playground.netlify.app/entries/",
+    "newWindow": true
+  }
 }
